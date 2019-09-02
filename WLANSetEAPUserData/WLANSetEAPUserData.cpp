@@ -56,33 +56,39 @@ int CALLBACK WinMain(
 	UNREFERENCED_PARAMETER(nCmdShow);
 
 	int result = -1;
-	bool interactive = false;
+	bool interactive = false;			// Schalter fuer Message-Box (wird bei Argument /i aktiviert"
 
 	try {
 		// Get command line arguments. (As Unicode, please.)
 		int nArgs;
 		unique_ptr<LPWSTR[], LocalFree_delete<LPWSTR[]> > pwcArglist(CommandLineToArgvW(GetCommandLineW(), &nArgs));
-		if (!pwcArglist) {
+		
+		if (!pwcArglist) { 
 			result = 100;
 			throw win_runtime_error("CommandLineToArgvW() failed");
 		}
-		if (nArgs < 4) {
+		if (nArgs < 4) { // falls weniger als vier Argumente uebergeben wurden (also eines fehlt, Programmname zaehlt mit)
 			result = 101;
 			throw invalid_argument("Not enough arguments.");
 		}
 
 		for (int i = 4; i < nArgs; i++)
-			if (_wcsicmp(pwcArglist[i], L"/I") == 0) interactive = true;
+			if (_wcsicmp(pwcArglist[i], L"/I") == 0) interactive = true;	//wcsimp = Zeichenvergleich
+																			// L = wchar_t-Literal (extended char-Set)
 
 		// Initialize COM.
-		com_initializer com_init(NULL);
+		// initialisiert COM-Bibliothek für aktuellen Trehad und identifiziert als Single-Thread
+		// (COM - Component Object Model: von MS entwickelte Technik zur Interprozesskommunikation
+		com_initializer com_init(NULL);			
 		if (FAILED(com_init.status())) {
 			result = 200;
 			throw com_runtime_error(com_init.status(), "CoInitialize() failed");
 		}
 
+		// XML einlesen
 		// Load user data XML into memory.
 		// Use MSXML6 IXMLDOMDocument to load XML to offload charset detection.
+		// bstr = better String
 		_bstr_t user_data;
 		{
 			// Create XML document.
