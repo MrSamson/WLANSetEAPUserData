@@ -159,7 +159,7 @@ int CALLBACK WinMain(
 			DWORD dwResult = WlanSetProfileEapXmlUserData(
 				wlan,
 				&(interfaces->InterfaceInfo[i].InterfaceGuid),
-				pwcArglist[1],
+				pwcArglist[1],										// --> Interface = Argument wird geändert
 				wcstoul(pwcArglist[2], NULL, 10),
 				user_data,
 				NULL);
